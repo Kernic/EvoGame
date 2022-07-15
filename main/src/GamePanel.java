@@ -10,8 +10,8 @@ public class GamePanel extends JPanel implements Runnable{
     final int scale = 3; // Will Scale tile to be bigger on screen
 
     final int tileSize = originalTileSize * scale; // Setting tile on screen size
-    final int maxScreenCol = 16;
-    final int maxScreenRow = 12;
+    final int maxScreenCol = 20;
+    final int maxScreenRow = 16;
     // Will set a ratio of 4x3
 
     final int screenWidth = tileSize * maxScreenCol; // 768px
@@ -23,7 +23,7 @@ public class GamePanel extends JPanel implements Runnable{
     // set player default position
     int playerX = 100;
     int playerY = 100;
-    int playerSpeed = 4;
+    int playerSpeed = 3;
 
     // FPS
     int FPS = 60;
@@ -47,19 +47,18 @@ public class GamePanel extends JPanel implements Runnable{
         /*
             Game Loop
          */
-        double drawInterval = 1000000000/FPS;
+        double drawInterval = (double) 1000/FPS;
         double delta = 0;
-        long lastTime = System.nanoTime();
+        long lastTime = System.currentTimeMillis();
         long currentTime;
         while (gameThread != null) {
-            currentTime = System.nanoTime(); // Getting the current time in nano seconds
+            currentTime = System.currentTimeMillis(); // Getting the current time in milliseconds
             delta += (currentTime - lastTime) / drawInterval;
 
             lastTime = currentTime;
 
             if (delta >= 1) {
                 update(); // Updates the frame
-
                 repaint(); // Calls paintComponent
 
                 delta --;
@@ -69,11 +68,14 @@ public class GamePanel extends JPanel implements Runnable{
     public void update () {
         if (keyH.upPressed){
             playerY -= playerSpeed;
-        } else if (keyH.downPressed) {
+        }
+        if (keyH.downPressed) {
             playerY += playerSpeed;
-        } else if (keyH.leftPressed) {
+        }
+        if (keyH.leftPressed) {
             playerX -= playerSpeed;
-        } else if (keyH.rightPressed) {
+        }
+        if (keyH.rightPressed) {
             playerX += playerSpeed;
         }
     }
