@@ -1,3 +1,7 @@
+package main;
+
+import entity.Player;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -9,7 +13,7 @@ public class GamePanel extends JPanel implements Runnable{
     final int originalTileSize = 16; // Tiles will be 16x16
     final int scale = 3; // Will Scale tile to be bigger on screen
 
-    final int tileSize = originalTileSize * scale; // Setting tile on screen size
+    public int tileSize = originalTileSize * scale; // Setting tile on screen size
     final int maxScreenCol = 20;
     final int maxScreenRow = 16;
     // Will set a ratio of 4x3
@@ -19,11 +23,7 @@ public class GamePanel extends JPanel implements Runnable{
 
     Thread gameThread;
     KeyHandler keyH = new KeyHandler();
-
-    // set player default position
-    int playerX = 100;
-    int playerY = 100;
-    int playerSpeed = 3;
+    Player player = new Player(this, keyH);
 
     // FPS
     int FPS = 60;
@@ -47,14 +47,17 @@ public class GamePanel extends JPanel implements Runnable{
         /*
             Game Loop
          */
-        double drawInterval = (double) 1000/FPS;
+        double drawInterval = (double) 1000000000/FPS;
         double delta = 0;
-        long lastTime = System.currentTimeMillis();
+        long lastTime = System.nanoTime();
         long currentTime;
-        while (gameThread != null) {
-            currentTime = System.currentTimeMillis(); // Getting the current time in milliseconds
-            delta += (currentTime - lastTime) / drawInterval;
+        long timer = 0;
+        int drawCount = 0;
 
+        while (gameThread != null) {
+            currentTime = System.nanoTime(); // Getting the current time in milliseconds
+            delta += (currentTime - lastTime) / drawInterval;
+            timer += (currentTime - lastTime);
             lastTime = currentTime;
 
             if (delta >= 1) {
@@ -62,30 +65,24 @@ public class GamePanel extends JPanel implements Runnable{
                 repaint(); // Calls paintComponent
 
                 delta --;
+                drawCount++;
+            }
+            if (timer >= 1000000000) {
+                System.out.println("FPS : " + drawCount);
+                drawCount = 0;
+                timer = 0;
             }
         }
     }
     public void update () {
-        if (keyH.upPressed){
-            playerY -= playerSpeed;
-        }
-        if (keyH.downPressed) {
-            playerY += playerSpeed;
-        }
-        if (keyH.leftPressed) {
-            playerX -= playerSpeed;
-        }
-        if (keyH.rightPressed) {
-            playerX += playerSpeed;
-        }
+        player.update();
     }
     public void paintComponent (Graphics g) {
         super.paintComponent(g); // when using painComponent function use this
 
         Graphics2D g2 = (Graphics2D)g; // Cast Graphics to 2D Graphics
 
-        g2.setColor(Color.WHITE);
-        g2.fillRect(playerX, playerY, tileSize, tileSize);
+        player.draw(g2);
 
         g2.dispose();
 
